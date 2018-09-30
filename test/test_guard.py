@@ -67,7 +67,7 @@ class TestGuard:
     mod.add_role(mod_read)
     mod.add_role(editor)
 
-    # 创建 3 个对象 mod，art，eat 其中 mod 对象下属模块有 art 对象，art 对象下属模块是eat 对象
+    # 创建 3 个对象 eng，art，eat 其中 eng 对象下属模块有 art 对象，art 对象下属模块是eat 对象
     eng = EnglishModule(parent=mod)
     eng.add_role(editor)
     eng.add_role(writer)
@@ -199,7 +199,7 @@ class TestGuard:
 class TestGuardBlack:
     """黑名单测试"""
 
-    # 创建 3 个角色， editor， writer， guest
+    # 创建 3 个角色， editor， writer， black_write
     editor = Role()
     editor.add_oper('read')
     editor.add_oper('create')
@@ -219,7 +219,7 @@ class TestGuardBlack:
     mod.add_role(mod_read)
     mod.add_role(editor)
 
-    # 创建 3 个对象 mod，art，eat 其中 mod 对象下属模块有 art 对象，art 对象下属模块是eat 对象
+    # 创建 3 个对象 eng，art，eat 其中 eng 对象下属模块有 art 对象，art 对象下属模块是eat 对象
     eng = EnglishModule(parent=mod)
     eng.add_role(editor)
     eng.add_role(writer)
@@ -290,7 +290,7 @@ class RoomModule(InheritTarget):
 class TestInheritTarget:
     """InheritTarget测试"""
 
-    # 创建 3 个角色， editor， writer， guest
+    # 创建 3 个角色， editor， writer， black_write
     editor = Role()
     editor.add_oper('read')
     editor.add_oper('create')
@@ -310,7 +310,7 @@ class TestInheritTarget:
     mod.add_role(mod_read)
     mod.add_role(editor)
 
-    # 创建 3 个对象 mod，art，eat 其中 mod 对象下属模块有 art 对象，art 对象下属模块是eat 对象
+    # 创建 3 个对象 tower，floor，room 其中 tower 对象下属模块有 floor 对象，room 对象下属模块是eat 对象
     tower = TowerModule(parent=mod)
     tower.add_role(writer)
     tower.add_role(black_write)
