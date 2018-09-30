@@ -18,7 +18,7 @@ def auth(func):
     """验证"""
 
     @wraps(func)
-    def wapper(who, what, check=False):
+    def wapper(who: User, what: Target, check: bool = False):
         user_roles = who.get_roles()
         work_roles = []
         # 获取可用的 role
@@ -40,6 +40,12 @@ def auth(func):
             if check:
                 return False
             raise PermissionError
+        # 是否拒绝操作
+        for role in work_roles:
+            if role.deny_or_not(func.__name__):
+                if check:
+                    return False
+                raise PermissionError
         if check:
             return True
         return func(who, what)
@@ -87,14 +93,14 @@ class Role:
     如果需要序列化保存，需要序列化 Role 的 _opers 和 _id 参数
     """
 
-    def __init__(self, id_: str = None, opers: List[str] = None):
+    def __init__(self, id_: str = None, opers: List[str] = None, deny_opers: List[str] = None):
         self._opers = opers if opers else []
+        self._deny_opers = deny_opers if deny_opers else []
         self._id = id_ if id_ else uuid.uuid4().hex
         global GLOBAL_ROLES
         if self._id in GLOBAL_ROLES:
             raise KeyError(f'[{id}] Role instance already exist, please get it from guard.get_global_roles(id_)')
         GLOBAL_ROLES[self._id] = self
-
 
     def get_id(self):
         """获取对象 id"""
@@ -108,14 +114,14 @@ class Role:
     def add_oper(self, oper: str):
         """增加操作"""
         if not isinstance(oper, str):
-            raise ValueError
+            raise TypeError
         if oper not in self._opers:
             self._opers.append(oper)
 
     def del_oper(self, oper: str):
         """删除操作"""
         if not isinstance(oper, str):
-            raise ValueError
+            raise TypeError
         if oper in self._opers:
             self._opers.remove(oper)
 
@@ -126,8 +132,35 @@ class Role:
     def can_or_not(self, oper: str):
         """是否可以"""
         if not isinstance(oper, str):
-            raise ValueError
+            raise TypeError
         if oper in self._opers:
+            return True
+        else:
+            return False
+
+    def deny_oper(self, oper: str):
+        """拒绝操作"""
+        if not isinstance(oper, str):
+            raise TypeError
+        if oper not in self._deny_opers:
+            self._deny_opers.append(oper)
+
+    def remove_deny_oper(self, oper: str):
+        """拒绝操作"""
+        if not isinstance(oper, str):
+            raise TypeError
+        if oper in self._deny_opers:
+            self._deny_opers.remove(oper)
+
+    def get_deny_opers(self):
+        """获取拒绝操作集"""
+        return self._deny_opers
+
+    def deny_or_not(self, oper: str):
+        """是否拒绝"""
+        if not isinstance(oper, str):
+            raise TypeError
+        if oper in self._deny_opers:
             return True
         else:
             return False
@@ -150,14 +183,14 @@ class RoleOper:
     def add_role(self, role: Role):
         """添加 role"""
         if not isinstance(role, Role):
-            raise ValueError
+            raise TypeError
         if role not in self._roles:
             self._roles.append(role)
 
     def del_role(self, role: Role):
         """删除 role"""
         if not isinstance(role, Role):
-            raise ValueError
+            raise TypeError
         if role in self._roles:
             self._roles.remove(role)
 
@@ -229,7 +262,7 @@ class User(RoleOper):
     def can_or_not(self, oper: str, target: Target):
         """是否可以操作 Target"""
         if not isinstance(oper, str) or not isinstance(target, Target):
-            raise ValueError
+            raise TypeError
         oper = getattr(self, oper, None)
         if not oper:
             return False
