@@ -270,8 +270,8 @@ class User(RoleOper):
     如果需要序列化保存，需要保存 User 的 _id 和 _roles 参数
     """
 
-    def __init__(self, id_: str = None):
-        super(User, self).__init__(id_)
+    def __init__(self, id_: str = None, roles: List[Role] = None):
+        super(User, self).__init__(id_=id_, roles=roles)
 
     def can_or_not(self, oper: str, target: Target):
         """是否可以操作 Target"""
