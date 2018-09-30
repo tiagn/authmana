@@ -10,7 +10,7 @@
 
 import uuid
 
-from typing import List
+from typing import List, Any
 from functools import wraps
 
 
@@ -166,6 +166,23 @@ class Role:
             return False
 
 
+class OriginalTarget:
+    """原始 Target
+
+    所有没有明确 _parent 的 Target 的 _parent 都是本类对象
+    id_ 为 True，表示此 Target 为 OriginalTarget
+    """
+
+    def __init__(self, id_: bool = True):
+        self._id = id_ if id_ else uuid.uuid4().hex
+
+    def get_id(self):
+        return self._id
+
+    def get_roles(self):
+        return [OriginalTarget]
+
+
 class RoleOper:
     """角色操作类
 
@@ -180,7 +197,7 @@ class RoleOper:
         """获取对象 id_"""
         return self._id
 
-    def add_role(self, role: Role):
+    def add_role(self, role: Any):
         """添加 role"""
         if not isinstance(role, Role):
             raise TypeError
@@ -197,23 +214,6 @@ class RoleOper:
     def get_roles(self):
         """获取 roles"""
         return self._roles
-
-
-class OriginalTarget:
-    """原始 Target
-
-    所有没有明确 _parent 的 Target 的 _parent 都是本类对象
-    id_ 为 True，表示此 Target 为 OriginalTarget
-    """
-
-    def __init__(self, id_: bool = True):
-        self._id = id_ if id_ else uuid.uuid4().hex
-
-    def get_id(self):
-        return self._id
-
-    def get_roles(self):
-        return [OriginalTarget]
 
 
 class Target(RoleOper):
@@ -243,6 +243,20 @@ class Target(RoleOper):
     def get_parent_roles(self):
         """获取上一级 Target 的 role"""
         return self._parent.get_roles()
+
+
+class InheritTarget(Target):
+    """继承目标类
+
+    需要继承 parent 的 roles 的类
+    其他同 Target
+
+    """
+
+    def __init__(self, parent=None, id_: str = None, roles: List[Role] = None):
+        super(InheritTarget, self).__init__(id_=id_, roles=roles, parent=parent)
+        for role in self.get_parent_roles():
+            self.add_role(role)
 
 
 class User(RoleOper):

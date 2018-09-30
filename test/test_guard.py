@@ -9,7 +9,7 @@
 # @Contact:   yecj@gzhhit.com
 import pytest
 
-from guard import Target, User, Role, auth, get_role_anyway
+from guard import Target, User, Role, auth, get_role_anyway, InheritTarget
 
 
 class EnglishModule(Target):
@@ -202,8 +202,6 @@ class TestGuardBlack:
     # 创建 3 个角色， editor， writer， guest
     editor = Role()
     editor.add_oper('read')
-    editor.add_oper('update')
-    editor.add_oper('delete')
     editor.add_oper('create')
 
     writer = get_role_anyway()
@@ -275,3 +273,92 @@ class TestGuardBlack:
         assert self.user1.create(self.eat) == oper
         assert self.user2.create(self.eat) == oper
         assert self.user3.create(self.eat) == oper
+
+
+class TowerModule(InheritTarget):
+    pass
+
+
+class FloorModule(InheritTarget):
+    pass
+
+
+class RoomModule(InheritTarget):
+    pass
+
+
+class TestInheritTarget:
+    """InheritTarget测试"""
+
+    # 创建 3 个角色， editor， writer， guest
+    editor = Role()
+    editor.add_oper('read')
+    editor.add_oper('create')
+
+    writer = get_role_anyway()
+    writer.add_oper('read')
+    writer.add_oper('create')
+
+    black_write = get_role_anyway()
+    black_write.deny_oper('create')
+
+    # 准备父类 Target 对象，准备对应的角色，添加基础的操作 （权限）
+    mod_read = get_role_anyway()
+    mod_read.add_oper('read')
+
+    mod = Target()
+    mod.add_role(mod_read)
+    mod.add_role(editor)
+
+    # 创建 3 个对象 mod，art，eat 其中 mod 对象下属模块有 art 对象，art 对象下属模块是eat 对象
+    tower = TowerModule(parent=mod)
+    tower.add_role(writer)
+    tower.add_role(black_write)
+
+    floor = FloorModule(tower)
+
+    room = RoomModule(floor)
+
+    # 创建 3 个用户 user1，user2，user3
+    user1 = person()
+    user1.add_role(mod_read)
+    user1.add_role(editor)
+
+    user2 = person()
+    user2.add_role(mod_read)
+    user2.add_role(writer)
+
+    user3 = person()
+    user3.add_role(mod_read)
+    user3.add_role(writer)
+    user3.add_role(black_write)
+
+    def test_create(self):
+        oper = 'create'
+        assert self.user1.can_or_not(oper, self.tower) is True
+        assert self.user2.can_or_not(oper, self.tower) is False
+        assert self.user3.can_or_not(oper, self.tower) is False
+
+        assert self.user1.create(self.tower) == oper
+        with pytest.raises(PermissionError):
+            assert self.user2.create(self.tower) == oper
+        with pytest.raises(PermissionError):
+            assert self.user3.create(self.tower) == oper
+
+        assert self.user1.can_or_not(oper, self.floor) is True
+        assert self.user2.can_or_not(oper, self.floor) is True
+        assert self.user3.can_or_not(oper, self.floor) is False
+
+        assert self.user1.create(self.floor) == oper
+        assert self.user2.create(self.floor) == oper
+        with pytest.raises(PermissionError):
+            assert self.user3.create(self.floor) == oper
+
+        assert self.user1.can_or_not(oper, self.room) is True
+        assert self.user2.can_or_not(oper, self.room) is True
+        assert self.user3.can_or_not(oper, self.room) is False
+
+        assert self.user1.create(self.room) == oper
+        assert self.user2.create(self.room) == oper
+        with pytest.raises(PermissionError):
+            assert self.user3.create(self.room) == oper
