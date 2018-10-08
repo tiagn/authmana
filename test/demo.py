@@ -1,12 +1,5 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/python2
 # -*- coding: utf8 -*-
-#
-# @File Name: demo
-# @Desc:
-# @Site: 
-# @Author:    yecj
-# @date:      2018/9/28
-# @Contact:   yecj@gzhhit.com
 
 from guard import auth
 from guard import User

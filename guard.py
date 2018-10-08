@@ -1,12 +1,6 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/python2
 # -*- coding: utf8 -*-
-#
-# @File Name: core.py
-# @Desc:
-# @Site:
-# @Author:    yecj
-# @date:      2018/9/27
-# @Contact:   yecj@gzhhit.com
+
 
 import uuid
 

@@ -1,12 +1,6 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/python2
 # -*- coding: utf8 -*-
-#
-# @File Name: test_guard
-# @Desc:
-# @Site: 
-# @Author:    yecj
-# @date:      2018/9/29
-# @Contact:   yecj@gzhhit.com
+
 import pytest
 
 from guard import Target, User, Role, auth, get_role_anyway, InheritTarget
