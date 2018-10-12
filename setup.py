@@ -54,7 +54,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=('tests',)),
+    py_modules=['authmana'],
     install_requires=REQUIRED,
     tests_require=TESTS_REQUIRED,
     extras_require=EXTRAS,
