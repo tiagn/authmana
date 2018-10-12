@@ -3,7 +3,7 @@
 
 import pytest
 
-from guard import Target, User, Role, auth, get_role_anyway, InheritTarget
+from authmana import Target, User, Role, auth, get_role_anyway, InheritTarget
 
 
 class EnglishModule(Target):

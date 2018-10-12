@@ -93,7 +93,7 @@ class Role:
         self._id = id_ if id_ else uuid.uuid4().hex
         global GLOBAL_ROLES
         if self._id in GLOBAL_ROLES:
-            raise KeyError(f'[{id}] Role instance already exist, please get it from guard.get_global_roles(id_)')
+            raise KeyError(f'[{id}] Role instance already exist, please get it from authmana.get_global_roles(id_)')
         GLOBAL_ROLES[self._id] = self
 
     def get_id(self):
